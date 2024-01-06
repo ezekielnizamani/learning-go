@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 type deck []string
@@ -35,10 +37,19 @@ func (d deck) saveToFile(fileName string) error {
 	return os.WriteFile(fileName, []byte(d.toString()), 06666)
 }
 func createDeckFromFile(fileName string) deck {
-	bs, error := os.ReadFile(fileName)
-	if error != nil {
-		println("Erorr:", error)
-
+	bs, err := os.ReadFile(fileName)
+	if err != nil {
+		fmt.Println("Erorr:", err)
 		os.Exit(1)
+	}
+	s := strings.Split(string(bs), ",")
+	return deck(s)
+}
+func (d deck) shuffle() {
+	source := rand.NewSource(time.Now().UnixNano())
+	r := rand.New(source)
+	for i := range d {
+		newPosition := r.Intn(len(d) - 1)
+		d[i], d[newPosition] = d[newPosition], d[i]
 	}
 }
